@@ -59,7 +59,7 @@ function Blocker.OnDraw()
             local creep_origin = Entity.GetAbsOrigin(npc)
 
             local x, y = Renderer.WorldToScreen(creep_origin)
-            DrawCircle(creep_origin, creep_melee_collision_size)
+            Blocker.DrawCircle(creep_origin, creep_melee_collision_size)
             local moves_to = Blocker.GetPredictedPosition(npc, 0.66)
 
             if not NPC.IsRunning(npc) then
@@ -88,12 +88,13 @@ function Blocker.OnDraw()
         end
         local dist = (best_position - origin):Length()
         local speed = NPC.GetMoveSpeed(myHero)
+        local totalLatency = (NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)) * 2
         if curtime > last_stop and dist >= 30 * speed / 315 and dist <= 150 * speed / 315 then--dist >= 30 and dist <= 150 then
             last_stop = curtime + 0.21 * speed / 315--0.21
             if less_stopping then
                 last_stop = curtime + 0.9
             end
-            sleep = curtime + 0.05 -- 0.05
+            sleep = curtime + 0.05 + totalLatency -- 0.05
             Player.PrepareUnitOrders(Players.GetLocal(), Enum.UnitOrder.DOTA_UNIT_ORDER_STOP, myHero, best_position, nil, Enum.PlayerOrderIssuer.DOTA_ORDER_ISSUER_HERO_ONLY)
         end
     end
@@ -146,7 +147,7 @@ end
 
 local size_x, size_y = Renderer.GetScreenSize()
 
-function DrawCircle(UnitPos, radius)
+function Blocker.DrawCircle(UnitPos, radius)
     local x1, y1 = Renderer.WorldToScreen(UnitPos)
     if x1 < size_x and x1 > 0 and y1 < size_y and y1 > 0 then
         local x4, y4, x3, y3, visible3

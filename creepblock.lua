@@ -90,11 +90,11 @@ function Blocker.OnDraw()
         local speed = NPC.GetMoveSpeed(myHero)
         local totalLatency = (NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)) * 2
         if curtime > last_stop and dist >= 30 * speed / 315 and dist <= 150 * speed / 315 then--dist >= 30 and dist <= 150 then
-            last_stop = curtime + 0.21 * speed / 315--0.21
+            last_stop = curtime + 0.21 * speed / 315 + totalLatency --0.21
             if less_stopping then
                 last_stop = curtime + 0.9
             end
-            sleep = curtime + 0.05 + totalLatency -- 0.05
+            sleep = curtime + 0.05 -- 0.05
             Player.PrepareUnitOrders(Players.GetLocal(), Enum.UnitOrder.DOTA_UNIT_ORDER_STOP, myHero, best_position, nil, Enum.PlayerOrderIssuer.DOTA_ORDER_ISSUER_HERO_ONLY)
         end
     end

@@ -59,7 +59,7 @@ function Blocker.OnDraw()
             local creep_origin = Entity.GetAbsOrigin(npc)
 
             local x, y = Renderer.WorldToScreen(creep_origin)
-            DrawCircle(creep_origin, creep_melee_collision_size)
+            Blocker.DrawCircle(creep_origin, creep_melee_collision_size)
             local moves_to = Blocker.GetPredictedPosition(npc, 0.66)
 
             if not NPC.IsRunning(npc) then
@@ -143,7 +143,7 @@ end
 
 local size_x, size_y = Renderer.GetScreenSize()
 
-function DrawCircle(UnitPos, radius)
+function Blocker.DrawCircle(UnitPos, radius)
     local x1, y1 = Renderer.WorldToScreen(UnitPos)
     if x1 < size_x and x1 > 0 and y1 < size_y and y1 > 0 then
         local x4, y4, x3, y3, visible3

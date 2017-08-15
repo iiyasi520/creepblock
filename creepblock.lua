@@ -128,6 +128,9 @@ function Blocker.GetPredictedPosition(npc, delay)
 
     if not NPC.IsRunning(npc) or not delay then return pos end
 
+    local totalLatency = (NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)) * 2
+    delay = delay + totalLatency
+
     local dir = Entity.GetRotation(npc):GetForward():Normalized()
     local speed = Blocker.GetMoveSpeed(npc)
 

@@ -8,6 +8,7 @@ local font = Renderer.LoadFont("Tahoma", 20, Enum.FontWeight.EXTRABOLD)
 local DOTA_TEAM_GOODGUYS = 2
 local DOTA_TEAM_BADGUYS = 3
 
+-- local npc_to_ignore = {}
 local top_towers = {}
 local mid_towers = {}
 local bottom_towers = {}
@@ -60,9 +61,12 @@ function Blocker.OnDraw()
 
             local x, y = Renderer.WorldToScreen(creep_origin)
             Blocker.DrawCircle(creep_origin, creep_melee_collision_size)
+
             local moves_to = Blocker.GetPredictedPosition(npc, 0.66)
 
             if not NPC.IsRunning(npc) then
+                --npc_to_ignore[npc_id] = curtime + 0.01
+            -- elseif (npc_to_ignore[npc_id] ~= nil and npc_to_ignore[npc_id] < curtime) then
             --     -- do nothing here
             else
                 local x2, y2 = Renderer.WorldToScreen(moves_to)
@@ -80,10 +84,16 @@ function Blocker.OnDraw()
         end
     end
 
+    -- Player.PrepareUnitOrders(Players.GetLocal(), Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_DIRECTION, nil, best_position, nil, Enum.PlayerOrderIssuer.DOTA_ORDER_ISSUER_PASSED_UNIT_ONLY , myHero)
     if best_position then
         local pos_to_fountain_len = (best_position - fountain_origin):Length()
         local name = NPC.GetUnitName(best_npc)
-        if curtime > sleep then
+        local collision_size = creep_melee_collision_size
+        -- if name ~= '' then
+        --     collision_size = creep_ranged_collision_size
+        -- end
+        -- Renderer.DrawText(font, hx, hy, (best_position - origin):Length()..'\n'..(hero_collision_size + collision_size + 1), 1)
+        if curtime > sleep then--and pos_to_fountain_len >= hero_to_fountain_len then -- and (best_position - origin):Length() <= 80 then -- and (best_position - origin):Length() <= hero_collision_size + collision_size + 1 then
             Player.PrepareUnitOrders(Players.GetLocal(), Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION, myHero, best_position, nil, Enum.PlayerOrderIssuer.DOTA_ORDER_ISSUER_HERO_ONLY)
         end
         local dist = (best_position - origin):Length()
@@ -125,8 +135,9 @@ end
 -- return predicted position
 function Blocker.GetPredictedPosition(npc, delay)
     local pos = Entity.GetAbsOrigin(npc)
-
     if not NPC.IsRunning(npc) or not delay then return pos end
+    local totalLatency = (NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)) * 2
+    delay = delay + totalLatency
 
     local dir = Entity.GetRotation(npc):GetForward():Normalized()
     local speed = Blocker.GetMoveSpeed(npc)

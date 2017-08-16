@@ -2,7 +2,7 @@ local Blocker = {}
 
 local creep_melee_collision_size = 16
 local creep_ranged_collision_size =  8
-local key = Menu.AddKeyOption({"Utility"}, "[W] CreepBlock", Enum.ButtonCode.KEY_SPACE)
+local key = Menu.AddKeyOption({"Utility"}, "[Bot] CreepBlock", Enum.ButtonCode.KEY_SPACE)
 local font = Renderer.LoadFont("Tahoma", 20, Enum.FontWeight.EXTRABOLD)
 
 local DOTA_TEAM_GOODGUYS = 2
@@ -12,7 +12,6 @@ local DOTA_TEAM_BADGUYS = 3
 local top_towers = {}
 local mid_towers = {}
 local bottom_towers = {}
-local my_line = nil
 local my_team = nil
 
 
@@ -61,13 +60,10 @@ function Blocker.OnDraw()
 
             local x, y = Renderer.WorldToScreen(creep_origin)
             Blocker.DrawCircle(creep_origin, creep_melee_collision_size)
-
             local moves_to = Blocker.GetPredictedPosition(npc, 0.66)
 
             if not NPC.IsRunning(npc) then
-                --npc_to_ignore[npc_id] = curtime + 0.01
-            -- elseif (npc_to_ignore[npc_id] ~= nil and npc_to_ignore[npc_id] < curtime) then
-            --     -- do nothing here
+                -- do nothing here
             else
                 local x2, y2 = Renderer.WorldToScreen(moves_to)
                 Renderer.DrawLine(x, y, x2, y2)
@@ -84,22 +80,18 @@ function Blocker.OnDraw()
         end
     end
 
-    -- Player.PrepareUnitOrders(Players.GetLocal(), Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_DIRECTION, nil, best_position, nil, Enum.PlayerOrderIssuer.DOTA_ORDER_ISSUER_PASSED_UNIT_ONLY , myHero)
     if best_position then
         local pos_to_fountain_len = (best_position - fountain_origin):Length()
         local name = NPC.GetUnitName(best_npc)
         local collision_size = creep_melee_collision_size
-        -- if name ~= '' then
-        --     collision_size = creep_ranged_collision_size
-        -- end
-        -- Renderer.DrawText(font, hx, hy, (best_position - origin):Length()..'\n'..(hero_collision_size + collision_size + 1), 1)
-        if curtime > sleep then--and pos_to_fountain_len >= hero_to_fountain_len then -- and (best_position - origin):Length() <= 80 then -- and (best_position - origin):Length() <= hero_collision_size + collision_size + 1 then
+
+        if curtime > sleep then
             Player.PrepareUnitOrders(Players.GetLocal(), Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION, myHero, best_position, nil, Enum.PlayerOrderIssuer.DOTA_ORDER_ISSUER_HERO_ONLY)
         end
         local dist = (best_position - origin):Length()
         local speed = NPC.GetMoveSpeed(myHero)
-        if curtime > last_stop and dist >= 30 * speed / 315 and dist <= 150 * speed / 315 then--dist >= 30 and dist <= 150 then
-            last_stop = curtime + 0.21 * speed / 315--0.21
+        if curtime > last_stop and dist >= 30 * speed / 315 and dist <= 150 * speed / 315 then
+            last_stop = curtime + 0.21 * speed / 315
             if less_stopping then
                 last_stop = curtime + 0.9
             end

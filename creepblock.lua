@@ -1,5 +1,5 @@
 local Blocker = {}
-Blocked.inited = false
+Blocker.inited = false
 
 local creep_melee_collision_size = 16
 local creep_ranged_collision_size =  8
